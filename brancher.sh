@@ -3,7 +3,7 @@
 USAGE="$0 COMMAND ARGUMENTS
 
 Commands:
-- clone REPOSITORY BRANCH           git clone the specified branch; or master if the branch is not available
+- clone REPOSITORY BRANCH [DIR]     git clone the specified branch; or master if the branch is not available -- optionally provide location
 - checkout WORK_TREE BRANCH         check out the specified remote branch as a local branch or master if the branch is not available"
 
 if [ $# -eq 0 ]; then
@@ -17,13 +17,14 @@ case $cmd in
 	"clone")
 		repo=$2
 		branch=$3
+		target=$4
 		if [ -z "$repo" -o -z "$branch" ]; then
 			echo "$USAGE"
 			exit 2
 		fi
 
 		echo "Cloning branch '$branch' of repository $repo..."
-		git clone -b $branch $repo >/dev/null 2>&1
+		git clone -b $branch $repo $target >/dev/null 2>&1
 		ec=$?
 		if [ $ec -ne 0 ]; then
 			echo "Cloning failed (code $ec). Attempting to clone master of repository $repo..."
