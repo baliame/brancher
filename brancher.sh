@@ -4,7 +4,8 @@ USAGE="$0 COMMAND ARGUMENTS
 
 Commands:
 - clone REPOSITORY BRANCH [DIR]     git clone the specified branch; or master if the branch is not available -- optionally provide location
-- checkout WORK_TREE BRANCH         check out the specified remote branch as a local branch or master if the branch is not available"
+- checkout WORK_TREE BRANCH         check out the specified remote branch as a local branch or master if the branch is not available
+- force-checkout WORK_TREE BRANCH   same as checkout, except a reset --hard will be executed (this might potentially destroy your changes if used incorrectly!)"
 
 if [ $# -eq 0 ]; then
 	echo "$USAGE"
@@ -38,7 +39,7 @@ case $cmd in
 		fi
 		exit 0
 		;;
-	"checkout")
+	"checkout"|"force-checkout")
 		target=$2
 		branch=$3
 		if [ -z "$target" -o -z "$branch" ]; then
@@ -51,9 +52,17 @@ case $cmd in
 			exit 5
 		fi
 
-		echo "Changing to $target..."
-		cd $target
-		echo "Resetting state..."
+		if [ "$target" != "." ]; then
+			echo "Changing to $target..."
+			cd $target
+		fi
+
+		if [ "$cmd" == "force-checkout" ]; then
+			git reset --hard >/dev/null 2>&1
+		fi
+
+		echo "Attempting to return to master..."
+
 		git checkout master >/dev/null 2>&1
 		ec=$?
 		if [ $ec -ne 0 ]; then
@@ -73,7 +82,7 @@ case $cmd in
 				cd - >/dev/null 2>&1
 				exit 4
 			fi
-			cd - >/dev/null
+			cd - >/dev/null 2>&1
 			exit 0
 		else
 			git branch -a | grep " remotes/origin/$branch" >/dev/null 2>&1
