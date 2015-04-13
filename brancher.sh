@@ -25,11 +25,13 @@ case $cmd in
 		fi
 
 		echo "Cloning branch '$branch' of repository $repo..."
-		git clone -b $branch $repo $target >/dev/null 2>&1
+		echo git clone -b $branch $repo $target
+		git clone -b $branch $repo $target
 		ec=$?
 		if [ $ec -ne 0 ]; then
 			echo "Cloning failed (code $ec). Attempting to clone master of repository $repo..."
-			git clone $repo >/dev/null 2>&1
+			echo git clone $repo $target
+			git clone $repo $target
 			ec=$?
 			if [ $ec -ne 0 ]; then
 				echo "Cloning failed (code $ec). No clone was created."
@@ -58,12 +60,13 @@ case $cmd in
 		fi
 
 		if [ "$cmd" == "force-checkout" ]; then
-			git reset --hard >/dev/null 2>&1
+			git reset --hard
 		fi
 
 		echo "Attempting to return to master..."
 
-		git checkout master >/dev/null 2>&1
+		echo git checkout master
+		git checkout master
 		ec=$?
 		if [ $ec -ne 0 ]; then
 			echo "Reset failed (code $ec). Aborting."
@@ -72,10 +75,12 @@ case $cmd in
 		fi
 
 		echo "Checking out..."
-		git branch -a | grep " $branch\$" >/dev/null 2>&1
+		echo git branch -a | grep " $branch\$"
+		git branch -a | grep " $branch\$"
 		if [ $? -eq 0 ]; then
 			echo "Checking out existing branch $branch..."
-			git checkout $branch >/dev/null 2>&1
+			echo git checkout $branch
+			git checkout $branch
 			ec=$?
 			if [ $ec -ne 0 ]; then
 				echo "Checkout failed (code $ec). Aborting."
@@ -85,33 +90,37 @@ case $cmd in
 			cd - >/dev/null 2>&1
 			exit 0
 		else
-			git branch -a | grep " remotes/origin/$branch" >/dev/null 2>&1
+			echo git branch -a | grep " remotes/origin/$branch\$"
+			git branch -a | grep " remotes/origin/$branch\$"
 			if [ $? -eq 0 ]; then
 				echo "Setting up local branch $branch..."
-				git branch $branch >/dev/null 2>&1
+				echo git branch $branch
+				git branch $branch
 				ec=$?
 				if [ $ec -ne 0 ]; then
 					echo "Branch setup failed (code $ec). Aborting."
-					cd - >/dev/null
+					cd - >/dev/null 2>&1
 					exit 4
 				fi
 				echo "Setting up branch tracking..."
-				git branch --set-upstream-to=remotes/origin/$branch $branch >/dev/null 2>&1
+				echo git branch --set-upstream-to=remotes/origin/$branch $branch
+				git branch --set-upstream-to=remotes/origin/$branch $branch
 				ec=$?
 				if [ $ec -ne 0 ]; then
 					echo "Branch setup failed (code $ec). Aborting."
-					cd - >/dev/null
+					cd - >/dev/null 2>&1
 					exit 4
 				fi
 				echo "Checking out newly setup branch $branch..."
-				git checkout $branch >/dev/null 2>&1
+				echo git checkout $branch
+				git checkout $branch
 				ec=$?
 				if [ $ec -ne 0 ]; then
 					echo "Checkout failed (code $ec). Aborting."
 					cd - >/dev/null 2>&1
 					exit 4
 				fi
-				cd - >/dev/null
+				cd - >/dev/null 2>&1
 				exit 0
 			else
 				echo "Target branch does not exist locally or remotely. Checking out master."
